@@ -12,6 +12,7 @@ Por consecuencia el código añadido en este repositorio será liberado con su r
 
 ## Objetivos del proyecto
 
+- [ ] Sustituir la librería de LibreDTE con la última versión existente.
 - [ ] Realizar los preparativos para una versión preparada para producción.
   - [ ] Levantar un contenedor Docker y publicarlo en el registro público.
   - [ ] Configurar PHP para exponer un servicio de forma segura.
