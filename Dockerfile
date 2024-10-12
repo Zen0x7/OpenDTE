@@ -18,12 +18,13 @@ RUN install-php-extensions \
 
 WORKDIR /srv
 
-COPY container/php.ini $PHP_INI_DIR/php.ini
 COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
+
 COPY . .
 
 RUN apk add supervisor \
-    && composer install
+    && composer install \
+    && mv container/php.ini $PHP_INI_DIR/php.ini
 
 EXPOSE 8000
 
