@@ -1,4 +1,14 @@
 {
+    "name": "zen0x7/opendte",
+    "type": "project",
+    "description": "OpenDTE es un proyecto abierto pensado para integrarse al servicio de impuestos internos mediante una implementación propia de forma ágil y segura.",
+    "keywords": ["sii", "factura electrónica", "boleta electrónica", "guia de despachos", "nota de crédito", "nota de débito", "chile"],
+    "license": "AGPL-3.0-or-later",
+    "autoload": {
+        "psr-4": {
+            "OpenDTE\\": "src/"
+        }
+    },
     "require": {
         "libredte/libredte-lib-core": "dev-master",
         "slim/slim": "^4.0",
