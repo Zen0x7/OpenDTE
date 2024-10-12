@@ -1,4 +1,4 @@
-# DTE API
+# OpenDTE
 
 ## Introducción
 
