@@ -143,7 +143,7 @@ class DTEService
             die(get_error("FORMATO_FECHA_RESOL"));
         }
 
-        $Resultado = DTE($firma, $folios, $caratula, $documento, $previsualizar);
+        $Resultado = DTEService::DTE($firma, $folios, $caratula, $documento, $previsualizar);
 
         $DTE = $Resultado["DTE"];
 
