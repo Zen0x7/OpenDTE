@@ -2,6 +2,7 @@
 
 namespace OpenDTE\Services;
 
+use OpenDTE\Exceptions\GenericException;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
@@ -91,8 +92,8 @@ class HelperService
     {
         $body = $req->getParsedBody();
         $query = $req->getQueryParams();
-        $es_certificacion = static::obtener_dato_de_query("certificacion", 0, $query);
-        $csv_delimitador = static::obtener_dato_de_query("csv_delimitador", ";", $query);
+        $es_certificacion = static::get_from_query_params("certificacion", 0, $query);
+        $csv_delimitador = static::get_from_query_params("csv_delimitador", ";", $query);
         $tipoOperacion = strtoupper($body["TipoOperacion"]);
 
         static::establecer_ambiente($es_certificacion);
@@ -123,7 +124,7 @@ class HelperService
     {
         $body = $req->getParsedBody();
         $query = $req->getQueryParams();
-        $es_certificacion = static::obtener_dato_de_query("certificacion", 0, $query);
+        $es_certificacion = static::get_from_query_params("certificacion", 0, $query);
 
         static::establecer_ambiente($es_certificacion);
 
@@ -149,7 +150,7 @@ class HelperService
     {
         $body = $req->getParsedBody();
         $query = $req->getQueryParams();
-        $es_certificacion = static::obtener_dato_de_query("certificacion", 0, $query);
+        $es_certificacion = static::get_from_query_params("certificacion", 0, $query);
 
         static::establecer_ambiente($es_certificacion);
 
@@ -174,55 +175,64 @@ class HelperService
     }
 
     /**
-     * Obtiene el valor desde un array, si el valor no existe
-     * en el array, se devolverá el valor de porefecto
-     * @param key llave a buscar en el array
-     * @param default valor a devolver si la llave no existe
-     * @return value valor encontrado o valor por defecto
+     * @param string $key
+     * @param mixed $default
+     * @param array $query
+     * @return mixed
      */
-    public static function obtener_dato_de_query($key, $default, $query)
+    public static function get_from_query_params(string $key, mixed $default, array $query) : mixed
     {
-        if (array_key_exists($key, $query)) {
-            return $query[$key];
-        }
-        return $default;
+        return array_key_exists($key, $query) ? $query[$key] : $default;
     }
 
     /**
-     * Verifica si el array enviado contiene un campo "data" codificado
-     * en base64 y mueestra un error si no lo es. Al encontrarlo lo
-     * decodifica y lo devuelve.
-     * @param dato Array con el campo "data"
-     * @param errorName Nombre del error a mostrar (en caso de haber uno)
-     * @return array información decodificada
+     * E
+     *
+     * @param array $data
+     * @param string $default_error
+     * @return array
+     * @throws GenericException
      */
-    public static function obtener_dato_base64($dato, $errorName)
+    public static function get_as_base64(array $data, string $default_error = "Something went wrong") : array
     {
-        if (!static::es_base64($dato["data"])) {
-            die(ErrorService::get_error($errorName));
-        }
+        if (!static::is_base64($data["data"]))
+            throw new GenericException("Trying to decode a non base64 value ... in ... $default_error");
 
-        return static::decodificar_dato64($dato);
+        return static::decode_base64($data);
     }
 
     /**
-     * Decodifica el campo "data" enviado en el array $codificado
-     * @param codificado array con la información codificada
-     * @return array información decodificada
+     * Decode base64 array input
+     *
+     * @param array $input
+     * @return array
+     * @throws GenericException
      */
-    public static function decodificar_dato64($codificado)
+    private static function decode_base64(array $input) : array
     {
-        $codificado["data"] = base64_decode($codificado["data"]);
-        return $codificado;
+        if (!array_key_exists("data", $input))
+            throw new GenericException("Trying to decode a missing array attribute ...");
+
+        $input["data"] = base64_decode($input["data"]);
+        return $input;
     }
 
     /**
-     * Verifica que el string enviado esté codificado en base64
-     * @param texto texto codificado a verificar
-     * @return boolean true si el texto está codificado en base64
+     * Verify is string is base64
+     *
+     * @param string $input
+     * @return boolean
      */
-    public static function es_base64($texto)
+    public static function is_base64(string $input) : bool
     {
-        return $texto and (bool) preg_match('/^[a-zA-Z0-9\/\r\n+]*={0,2}$/', $texto);
+        return $input && preg_match('/^[a-zA-Z0-9\/\r\n+]*={0,2}$/', $input);
+    }
+
+    /**
+     * @param string $input
+     * @return bool
+     */
+    public static function is_valid_date(string $input) : bool {
+        return !preg_match("/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/", $input);
     }
 }

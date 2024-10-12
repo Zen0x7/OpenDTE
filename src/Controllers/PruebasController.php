@@ -9,7 +9,7 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 class PruebasController {
     public function __invoke(Request $req, Response $res) : Response {
         $callback = function ($body) {
-            $set = HelperService::obtener_dato_base64($body["Set"], "UNKNOWN");
+            $set = HelperService::get_as_base64($body["Set"], "UNKNOWN");
             $folios = $body["Folios"];
             $folios_primer = [];
             $folios_data = [];

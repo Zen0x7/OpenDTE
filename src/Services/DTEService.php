@@ -2,6 +2,8 @@
 
 namespace OpenDTE\Services;
 
+use OpenDTE\Exceptions\GenericException;
+
 class DTEService
 {
     const LIBRO_COMPRA = "COMPRA";
@@ -90,7 +92,7 @@ class DTEService
 
         foreach ($Documentos as $DTE) {
             if (!$DTE->getDatos())
-                die(get_error("NO_DTE_DATA"));
+                throw new GenericException("DTE doesn't contains any data ...");
 
             $pdf = new \sasco\LibreDTE\Sii\Dte\PDF\Dte($papelContinuo);
 
@@ -114,33 +116,34 @@ class DTEService
      * @param documento array con valores para agregar en el DTE
      * @param logoUrl URL al logo en formato PNG para agregar al PDF
      * @param query valores obtenidos desde getQueryParams
+     * @throws GenericException
      */
-    public static function generar_documento($firma, $folios, $caratula, $documento, $logoUrl, $query)
+    public static function generar_documento($firma, $folios, array $caratula, array $documento, $logoUrl, $query)
     {
         // previsualizar o enviar documento
-        $previsualizar = (bool)HelperService::obtener_dato_de_query("previsualizar", 0, $query) + 0;
+        $previsualizar = (bool)HelperService::get_from_query_params("previsualizar", 0, $query) + 0;
 
         // Obtiene la posición del logo
-        $logo_izquierda = HelperService::obtener_dato_de_query("logo_izquierda", 1, $query) + 0;
+        $logo_izquierda = HelperService::get_from_query_params("logo_izquierda", 1, $query) + 0;
 
         // Obtiene el valor para el papel continuo
-        $papelContinuo = HelperService::obtener_dato_de_query("papel_continuo", false, $query) + 0;
+        $papelContinuo = HelperService::get_from_query_params("papel_continuo", false, $query) + 0;
 
         // Decodifica la firma que viene en base64
-        $firma = HelperService::obtener_dato_base64($firma, "FIRMA_NO_BASE64");
+        $firma = HelperService::get_as_base64($firma, "FIRMA_NO_BASE64");
 
         // Decodifica los folios que vienen en base64
         if (array_key_exists("data", $folios)) {
-            $folios = HelperService::obtener_dato_base64($folios, "FOLIOS_NO_BASE64")["data"];
+            $folios = HelperService::get_as_base64($folios, "FOLIOS_NO_BASE64")["data"];
         } else {
             foreach ($folios as $key => $folio) {
-                $folios[$key] = HelperService::obtener_dato_base64($folio, "FOLIOS_NO_BASE64");
+                $folios[$key] = HelperService::get_as_base64($folio, "FOLIOS_NO_BASE64");
             }
         }
 
         // Verifica que la fecha tenga el formato yyyy-mm-dd
-        if (!preg_match("/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/", $caratula["FchResol"])) {
-            die(get_error("FORMATO_FECHA_RESOL"));
+        if (!HelperService::is_valid_date($caratula["FchResol"])) {
+            throw new GenericException("Caractura doesn't contains `yyyy-mm-dd` date format ...");
         }
 
         $Resultado = DTEService::DTE($firma, $folios, $caratula, $documento, $previsualizar);
@@ -167,11 +170,11 @@ class DTEService
     {
 
         // Decodifica la firma que viene en base64
-        $firma = HelperService::obtener_dato_base64($firma, "FIRMA_NO_BASE64");
+        $firma = HelperService::get_as_base64($firma, "FIRMA_NO_BASE64");
 
         // Verifica que la fecha tenga el formato yyyy-mm-dd
-        if (!preg_match("/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/", $caratula["FchResol"])) {
-            die(ErrorService::get_error("FORMATO_FECHA_RESOL"));
+        if (!HelperService::is_valid_date($caratula["FchResol"])) {
+            throw new GenericException("Caractura doesn't contains `yyyy-mm-dd` date format ...");
         }
 
         // Objetos de Firma y LibroGuia
@@ -212,10 +215,10 @@ class DTEService
     public static function enviar_libro_compra_venta($firma, $caratula, $archivoParseado, $tipoOperacion, $query)
     {
         // Cuando es 1 el libro es simplificado
-        $simplificado = (bool) HelperService::obtener_dato_de_query("simplificado", 0, $query) + 0;
+        $simplificado = (bool) HelperService::get_from_query_params("simplificado", 0, $query) + 0;
 
         // Decodifica la firma que viene en base64
-        $firma = HelperService::obtener_dato_base64($firma, "FIRMA_NO_BASE64");
+        $firma = HelperService::get_as_base64($firma, "FIRMA_NO_BASE64");
 
         // Objetos de Firma y LibroCompraVenta
         $Firma = new \sasco\LibreDTE\FirmaElectronica($firma);

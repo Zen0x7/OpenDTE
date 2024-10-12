@@ -14,7 +14,6 @@ $app->addErrorMiddleware(true, false, false);
 $app->addBodyParsingMiddleware();
 
 $app->group("/dte", function (RouteCollectorProxy $group) {
-
     $group->post("/consultar", OpenDTE\Controllers\ConsultarController::class);
 
     $group->post("/emitir/masivo", OpenDTE\Controllers\Emision\MasivoController::class);

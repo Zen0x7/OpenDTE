@@ -2,6 +2,8 @@
 
 namespace OpenDTE\Controllers\Libros;
 
+use OpenDTE\Services\DTEService;
+use OpenDTE\Services\HelperService;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
@@ -24,6 +26,6 @@ class CompraVentaController
             return array("Caratula" => $caratula, "Libro" => $body["Libro"]);
         };
 
-        return peticion_libro_compra_venta($callback, $req, $res);
+        return HelperService::peticion_libro_compra_venta($callback, $req, $res);
     }
 }
