@@ -16,4 +16,15 @@ RUN install-php-extensions \
     soap \
     excimer
 
+WORKDIR /srv
+
 COPY container/php.ini $PHP_INI_DIR/php.ini
+COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
+COPY . .
+
+RUN apk add supervisor \
+    && composer install
+
+EXPOSE 8000
+
+ENTRYPOINT ["/usr/bin/supervisord", "-c", "/srv/container/supervisor.conf"]
