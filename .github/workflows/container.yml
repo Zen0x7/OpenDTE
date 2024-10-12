@@ -4,7 +4,8 @@ on:
   push:
 
 jobs:
-  docker:
+  container:
+    name: Container
     runs-on: ubuntu-latest
     steps:
       -
