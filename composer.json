@@ -1,7 +1,7 @@
 {
     "require": {
-        "sasco/libredte": "20.7.*",
-        "slim/slim": "4.*",
-        "slim/psr7": "1.2.*"
+        "libredte/libredte-lib-core": "dev-master",
+        "slim/slim": "^4.0",
+        "slim/psr7": "^1.7"
     }
 }
