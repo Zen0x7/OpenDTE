@@ -1,0 +1,30 @@
+version: "3"
+services:
+  dte-api:
+    restart: "always"
+    image: chialab/php:7.3-fpm
+    command: bash -c "composer install && php -S 0.0.0.0:8000 index.php"
+    expose:
+      - "8000"
+    volumes:
+      - .:/var/www/html
+      
+  # APP CON EJEMPLO DE NODEJS
+  app-node:
+    image: node:12.13.1-alpine
+    volumes:
+      - ./ejemplos/node:/usr/src/service
+    working_dir: /usr/src/service
+    command: npm run dev
+    ports:
+      - 3000:3000
+  
+  # APP CON EJEMPLO DE PHP
+  app-php:
+    image: php:8-apache
+    ports: # Debes usar el mismo puerto que tu servidor
+      - "3001:80"
+    depends_on: 
+      - dte-api
+    volumes:
+      - ./ejemplos/php/:/var/www/html
